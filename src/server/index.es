@@ -20,6 +20,7 @@ import routes from '~/common/components/routes'
 import {
   createStores,
 } from '~/common/stores'
+import preloadState from './utils/preloadState'
 
 useStaticRendering(true)
 
@@ -82,25 +83,21 @@ app.use((req, res, next) => {
   match({
     routes,
     location: req.url,
-  }, (err, redirectLocation, renderProps) => {
+  }, async (err, redirectLocation, renderProps) => {
     if (err) {
       next(err)
     } else if (redirectLocation) {
       res.redirect(redirectLocation.pathname + redirectLocation.search)
     } else if (renderProps) {
-      const {
-        appData,
-      } = res.locals
-
+      const appState = await preloadState(renderProps.routes, req)
       const appHtml = ReactDOMServer.renderToString(
-        <Provider {...createStores(appData)}>
+        <Provider {...createStores(appState)}>
            <RouterContext {...renderProps} />
         </Provider>
       )
-
       res.render('index', {
         appHtml,
-        appData,
+        appState,
       })
     } else {
       next()

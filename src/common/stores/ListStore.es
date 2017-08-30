@@ -14,10 +14,6 @@ export default class ListStore {
     }
   }
 
-  static init = async (req) => {
-    return req.session.items
-  }
-
   @observable items = null
 
   addItem = async () => {

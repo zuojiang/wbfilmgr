@@ -1,5 +1,4 @@
 import express from 'express'
-import ListStore from '~/common/stores/ListStore'
 
 const router = express.Router()
 
@@ -33,15 +32,6 @@ router.use('/test', (req, res, next) => {
     default:
       next()
   }
-})
-
-router.use(async (req, res, next) => {
-  res.locals.appData = {
-    listStore: {
-      items: await ListStore.init(req),
-    },
-  }
-  next()
 })
 
 export default router

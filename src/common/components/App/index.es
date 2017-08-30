@@ -15,6 +15,17 @@ export default class App extends Component {
     super(props)
   }
 
+  static id = 12
+
+  static getPreloadedState = async (path, state, req) => {
+    return {
+      ...state,
+      listStore: {
+        items: req.session.items,
+      }
+    }
+  }
+
   render () {
     const {
       items,

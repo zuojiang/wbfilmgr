@@ -8,9 +8,10 @@
     "test": "better-npm-run test",
     "test:server": "babel-watch -w ./src ./src/server/index.es",
     "test:client": "webpack-dev-server --progress",
-    "compile": "npm-run-all compile:server compile:client",
+    "compile": "npm-run-all clean compile:server compile:client",
     "compile:server": "babel ./src --ignore ./src/client -D --out-dir ./out",
-    "compile:client": "webpack --progress -p"
+    "compile:client": "webpack --progress -p",
+    "clean": "rm -rf ./out/*"
   },
   "betterScripts": {
     "start": {
@@ -67,6 +68,7 @@
     "isomorphic-fetch": "^2.2.1",
     "mobx": "^3.2.2",
     "mobx-react": "^4.2.2",
+    "prop-types": "^15.5.10",
     "pug": "^2.0.0-rc.3",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
