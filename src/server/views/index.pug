@@ -11,5 +11,5 @@ html
   body
     div#root!= appHtml
     script(type='text/javascript').
-      var appState = !{JSON.stringify(appState)}
+      var appData = !{JSON.stringify(appData)}
     script(type='text/javascript' src=`${baseUrl}/res/js/bundle.js`)

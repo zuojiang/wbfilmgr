@@ -14,9 +14,7 @@ router.use((req, res, next) => {
 })
 
 router.use('/test', (req, res, next) => {
-  const {
-    action,
-  } = req.body
+  const action = req.body.action || req.query.action
   const {
     items,
   } = req.session
@@ -27,6 +25,11 @@ router.use('/test', (req, res, next) => {
       items.push(data)
       res.json({
         data,
+      })
+      break
+    case 'queryItems':
+      res.json({
+        data: items,
       })
       break
     default:

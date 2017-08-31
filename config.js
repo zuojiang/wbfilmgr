@@ -1,6 +1,7 @@
 module.exports = {
   httpPort: 3000,
   baseUrl: '',
+  restUrl: '',
   sessionSecret: 'private key',
 }
 

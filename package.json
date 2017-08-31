@@ -21,7 +21,7 @@
       }
     },
     "test": {
-      "command": "npm-run-all --parallel test:*",
+      "command": "npm-run-all -p test:*",
       "env": {
         "NODE_ENV": "development"
       }

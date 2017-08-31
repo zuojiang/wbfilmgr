@@ -5,7 +5,9 @@ import {
   runInAction,
 } from 'mobx'
 
-import fetch from '~/common/utils/fetch'
+import {
+  listService,
+} from '~/common/services'
 
 export default class ListStore {
   constructor(data) {
@@ -17,18 +19,6 @@ export default class ListStore {
   @observable items = null
 
   addItem = async () => {
-    const {
-      data,
-    } = await fetch('/test', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        action: 'addItem'
-      })
-    })
-
-    this.items.push(data)
+    this.items.push(await listService.addItem())
   }
 }

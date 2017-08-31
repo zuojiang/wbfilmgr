@@ -6,6 +6,9 @@ import {
   Observer,
 } from 'mobx-react'
 
+import {
+  listService,
+} from '~/common/services'
 import css from './style.css'
 
 @inject('listStore')
@@ -15,13 +18,11 @@ export default class App extends Component {
     super(props)
   }
 
-  static id = 12
-
-  static getPreloadedState = async (path, state, req) => {
+  static getPreloadedState = async (path, state, serverInfo) => {
     return {
       ...state,
       listStore: {
-        items: req.session.items,
+        items: await listService.queryItems(serverInfo),
       }
     }
   }

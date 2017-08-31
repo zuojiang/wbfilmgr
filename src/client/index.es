@@ -13,6 +13,6 @@ import {
   createStores,
 } from '~/common/stores'
 
-ReactDOM.render(<Provider {...createStores(global.appState)}>
+ReactDOM.render(<Provider {...createStores(global.appData.state)}>
   <Router history={browserHistory} routes={routes} />
 </Provider>, document.getElementById('root'))

@@ -1,4 +1,5 @@
-import path from 'path'
+import Path from 'path'
+import Url from 'url'
 import express from 'express'
 import proxy from 'http-proxy-middleware'
 import bodyParser from 'body-parser'
@@ -22,18 +23,22 @@ import {
 } from '~/common/stores'
 import preloadState from './utils/preloadState'
 
-useStaticRendering(true)
-
-const {
+import {
   httpPort,
   baseUrl,
+  restUrl,
   sessionSecret,
-} = require(path.join(process.cwd(), 'config'))
+} from '../../config'
+import {
+  devServer,
+} from '../../webpack.config'
+
+useStaticRendering(true)
 
 const app = express()
 const env = app.get('env')
 app.set('x-powered-by', false)
-app.set('views', path.join(__dirname, 'views'))
+app.set('views', Path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 app.engine('pug', pug.__express)
 
@@ -49,7 +54,7 @@ if (env === 'development') {
     '/res/css/bundle.css',
     '/res/css/bundle.css.map',
   ], proxy({
-    target: 'http://127.0.0.1:3200',
+    target: `http://127.0.0.1:${devServer.port}`,
     changeOrigin: true,
     onProxyRes: (proxyRes, req, res) => {
       proxyRes.headers['Access-Control-Allow-Origin'] = '*'
@@ -59,8 +64,8 @@ if (env === 'development') {
   }))
 }
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
-app.use(express.static(path.join(__dirname, 'public'), {
+app.use(favicon(Path.join(__dirname, 'public', 'favicon.ico')))
+app.use(express.static(Path.join(__dirname, 'public'), {
   index: false,
 }))
 
@@ -89,16 +94,46 @@ app.use((req, res, next) => {
     } else if (redirectLocation) {
       res.redirect(redirectLocation.pathname + redirectLocation.search)
     } else if (renderProps) {
-      const appState = await preloadState(renderProps.routes, req)
-      const appHtml = ReactDOMServer.renderToString(
-        <Provider {...createStores(appState)}>
-           <RouterContext {...renderProps} />
-        </Provider>
-      )
-      res.render('index', {
-        appHtml,
-        appState,
-      })
+      const {
+        protocol,
+        headers,
+      } = req
+
+      let urlPrefix
+      if (/^(http|https):\/\//i.test(restUrl)) {
+        urlPrefix = restUrl
+      } else if (/^\/\/[^\/]/.test(restUrl)) {
+        urlPrefix = `${protocol}:${restUrl}`
+      } else {
+        urlPrefix = Url.format({
+          protocol: protocol + ':',
+          hostname: '127.0.0.1',
+          port: httpPort,
+          pathname: restUrl ? Path.posix.normalize(restUrl) : null,
+        })
+      }
+
+      try {
+        const state = await preloadState(renderProps.routes, {
+          urlPrefix,
+          headers,
+        })
+        const appHtml = ReactDOMServer.renderToString(
+          <Provider {...createStores(state)}>
+            <RouterContext {...renderProps} />
+          </Provider>
+        )
+        res.render('index', {
+          appHtml,
+          appData: {
+            state,
+            baseUrl,
+            restUrl,
+          },
+        })
+      } catch (e) {
+        next(e)
+      }
     } else {
       next()
     }
