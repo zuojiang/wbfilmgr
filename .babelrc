@@ -8,5 +8,8 @@
     ["babel-plugin-root-import", {
       "rootPathSuffix": "src"
     }]
+  ],
+  "ignore": [
+    "src/server.config.js"
   ]
 }

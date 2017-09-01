@@ -28,10 +28,7 @@ import {
   baseUrl,
   restUrl,
   sessionSecret,
-} from '../../config'
-import {
-  devServer,
-} from '../../webpack.config'
+} from '~/server.config'
 
 useStaticRendering(true)
 
@@ -48,6 +45,9 @@ app.locals = {
 
 if (env === 'development') {
   app.locals.pretty = true
+  const {
+    devServer,
+  } = require('../../webpack.config')
   app.use([
     '/res/js/bundle.js',
     '/res/js/bundle.js.map',
