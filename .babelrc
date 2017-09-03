@@ -4,7 +4,10 @@
     "transform-runtime",
     "transform-async-to-generator",
     "transform-decorators-legacy",
-    "css-modules-transform",
+    ["css-modules-transform", {
+      "generateScopedName": "[folder]__[local]___[hash:base64:5]",
+      "camelCase": true,
+    }],
     ["babel-plugin-root-import", {
       "rootPathSuffix": "src"
     }]
