@@ -5,44 +5,41 @@ import {
   observer,
   Observer,
 } from 'mobx-react'
+import {
+  Layout,
+  Menu,
+  Breadcrumb,
+} from 'antd'
 
 import {
   listService,
 } from '~/common/services'
 import css from './style.css'
 
-@inject('listStore')
+// @inject('listStore')
 @observer
 export default class App extends Component {
   constructor(props) {
     super(props)
   }
 
-  static getPreloadedState = async (path, state, serverInfo) => {
-    return {
-      ...state,
-      listStore: {
-        items: await listService.queryItems(serverInfo),
-      }
-    }
-  }
+  // static getPreloadedState = async (path, state, serverInfo) => {
+  //   return {
+  //     ...state,
+  //   }
+  // }
 
   render () {
-    const {
-      items,
-      addItem,
-    } = this.props.listStore
-
-    return <div>
-        <h2>App</h2>
-        <button className={css.btn} onClick={evt => addItem()} >Add</button>
-        <ul>
-          {
-            items.map((item, i) => {
-              return <li key={i}>{item}</li>
-            })
-          }
-        </ul>
-    </div>
+    return <Layout className={css.layout}>
+      <Layout.Header>
+      header
+      </Layout.Header>
+      <Layout.Content>
+content
+      </Layout.Content>
+      <Layout.Footer>
+footer
+      </Layout.Footer>
+    </Layout>
   }
 }
