@@ -5,9 +5,11 @@ import {
   observer,
   Observer,
 } from 'mobx-react'
-import Layout from 'antd/lib/layout'
 
 import css from './style.css'
+import {
+  Button
+} from 'amazeui-touch'
 
 export default class App extends Component {
   constructor(props) {
@@ -15,10 +17,9 @@ export default class App extends Component {
   }
 
   render () {
-    return <Layout className={css.layout}>
-      <Layout.Header>header</Layout.Header>
-      <Layout.Content>content</Layout.Content>
-      <Layout.Footer>footer</Layout.Footer>
-    </Layout>
+    return <div>
+      <Button block>Default Block</Button>
+      <Button amStyle="primary" block>Primary Block</Button>
+    </div>
   }
 }
