@@ -5,6 +5,7 @@ import proxy from 'http-proxy-middleware'
 import bodyParser from 'body-parser'
 import favicon from 'serve-favicon'
 import session from 'express-session'
+import useragent from 'express-useragent'
 import pug from 'pug'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
@@ -16,13 +17,12 @@ import {
   Provider,
   useStaticRendering,
 } from 'mobx-react'
+import qrcode from 'qrcode-terminal'
+import ip from 'ip'
 
-import routes from '~/common/components/routes'
-import {
-  createStores,
-} from '~/common/stores'
-import preloadState from './utils/preloadState'
-
+import returnRoutes from '~/common/components/returnRoutes'
+import createStores from '~/common/stores/createStores'
+import preloadState from '~/server/utils/preloadState'
 import {
   httpPort,
   baseUrl,
@@ -81,12 +81,16 @@ app.use(session({
     secure: false,
   }
 }))
+app.use(useragent.express())
 
 app.use(require('./logic/test').default)
 
 app.use((req, res, next) => {
+  const {
+    useragent: userAgent
+  } = req
   match({
-    routes,
+    routes: returnRoutes(userAgent),
     location: req.url,
   }, async (err, redirectLocation, renderProps) => {
     if (err) {
@@ -127,6 +131,7 @@ app.use((req, res, next) => {
           appHtml,
           appData: {
             state,
+            userAgent,
             baseUrl,
             restUrl,
           },
@@ -140,4 +145,10 @@ app.use((req, res, next) => {
   })
 })
 
-app.listen(httpPort)
+app.listen(httpPort, () => {
+  const url = `http://${ip.address()}:${httpPort}`
+  if (env !== 'development') {
+    qrcode.generate(url)
+  }
+  console.log(`\n${url}\n`)
+})
