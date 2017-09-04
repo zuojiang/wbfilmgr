@@ -4,7 +4,7 @@ const stores = {
   listStore: ListStore,
 }
 
-export function createStores (values = {}) {
+export default function (values = {}) {
   const _stores = {}
   for(let name in stores) {
     let Store = stores[name]

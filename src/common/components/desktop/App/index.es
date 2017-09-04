@@ -34,7 +34,7 @@ export default class App extends Component {
     } = this.props.listStore
 
     return <div>
-        <h2>App</h2>
+        <h2>App on Desktop</h2>
         <button className={css.btn} onClick={evt => addItem()} >Add</button>
         <ul>
           {

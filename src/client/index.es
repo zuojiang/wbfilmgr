@@ -8,11 +8,14 @@ import {
   Provider,
 } from 'mobx-react'
 
-import routes from '~/common/components/routes'
-import {
-  createStores,
-} from '~/common/stores'
+import returnRoutes from '~/common/components/returnRoutes'
+import createStores from '~/common/stores/createStores'
 
-ReactDOM.render(<Provider {...createStores(global.appData.state)}>
-  <Router history={browserHistory} routes={routes} />
+const {
+  state,
+  userAgent,
+} = global.appData
+
+ReactDOM.render(<Provider {...createStores(state)}>
+  <Router history={browserHistory} routes={returnRoutes(userAgent)} />
 </Provider>, document.getElementById('root'))
