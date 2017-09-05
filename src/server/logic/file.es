@@ -1,0 +1,60 @@
+import Path from 'path'
+import express from 'express'
+import fs from 'fs-extra-promise'
+import prettyBytes from 'pretty-bytes'
+
+const router = express.Router()
+const cwd = process.cwd()
+
+router.use((req, res, next) => {
+  res.locals.path = Path.join(cwd, req.url)
+  next()
+})
+
+// router.post('/upload', (req, res, next) => {
+//
+// })
+
+router.get('*', async (req, res, next) => {
+  const {path} = res.locals
+
+  try {
+    const files = await fs.readdirAsync(path)
+    let data = []
+    for(let filename of files) {
+      let stats = await fs.statAsync(Path.join(path, filename))
+      data.push({
+        filename,
+        type: stats.isDirectory() ? 'directory' : 'file',
+        size: prettyBytes(stats.size),
+        birthtime: stats.birthtime,
+        modifytime: stats.mtime,
+      })
+    }
+    data.sort((a, b) => {
+      if (a.type === 'directory' && b.type === 'file') {
+        return -1
+      } else if (a.type === 'file' && b.type === 'directory') {
+        return 1
+      }
+      return 0
+    })
+    res.json({data})
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.delete('*', async (req, res, next) => {
+
+})
+
+router.post('*', async (req, res, next) => {
+
+})
+
+router.put('*', async (req, res, next) => {
+
+})
+
+export default router

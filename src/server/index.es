@@ -83,7 +83,7 @@ app.use(session({
 }))
 app.use(useragent.express())
 
-app.use(require('./logic/test').default)
+app.use(restUrl, require('./logic/file').default)
 
 app.use((req, res, next) => {
   const {
@@ -101,6 +101,10 @@ app.use((req, res, next) => {
       const {
         protocol,
         headers,
+        params,
+        query,
+        body,
+        url,
       } = req
 
       let urlPrefix
@@ -118,9 +122,18 @@ app.use((req, res, next) => {
       }
 
       try {
-        const state = await preloadState(renderProps.routes, {
+        const state = await preloadState({
+          configStore: {
+            baseUrl,
+            restUrl,
+          }
+        }, renderProps.routes, {
           urlPrefix,
           headers,
+          params,
+          query,
+          body,
+          url,
         })
         const appHtml = ReactDOMServer.renderToString(
           <Provider {...createStores(state)}>
@@ -132,8 +145,6 @@ app.use((req, res, next) => {
           appData: {
             state,
             userAgent,
-            baseUrl,
-            restUrl,
           },
         })
       } catch (e) {

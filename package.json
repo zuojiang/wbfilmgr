@@ -64,21 +64,25 @@
     "antd": "^2.12.8",
     "body-parser": "^1.17.2",
     "busboy": "^0.2.14",
+    "del": "^3.0.0",
     "es6-promise": "^4.1.1",
     "express": "^4.15.4",
     "express-session": "^1.15.5",
     "express-useragent": "^1.0.7",
+    "fs-extra-promise": "^1.0.1",
     "http-proxy-middleware": "^0.17.4",
     "ip": "^1.1.5",
     "isomorphic-fetch": "^2.2.1",
     "mobx": "^3.2.2",
     "mobx-react": "^4.2.2",
+    "pretty-bytes": "^4.0.2",
     "prop-types": "^15.5.10",
     "pug": "^2.0.0-rc.3",
     "qrcode-terminal": "^0.11.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-router": "^3.0.5",
-    "serve-favicon": "^2.4.3"
+    "serve-favicon": "^2.4.3",
+    "trash": "^4.0.1"
   }
 }

@@ -1,6 +1,9 @@
-import ListStore from './ListStore'
+import FileStore from './FileStore'
+import ConfigStore from './ConfigStore'
 
 const stores = {
+  configStore: ConfigStore,
+  fileStore: FileStore,
 }
 
 export default function (values = {}) {

@@ -1,8 +1,7 @@
 module.exports = {
   httpPort: 3000,
   baseUrl: '',
-
-  restUrl: '',
+  restUrl: '/rest',
   sessionSecret: 'private key',
 }
 

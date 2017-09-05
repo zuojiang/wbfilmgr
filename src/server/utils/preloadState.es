@@ -1,6 +1,6 @@
 export default async function (...args) {
+  let state = args.shift()
   const routes = args.shift()
-  let state = {}
 
   for(let {
     path,
