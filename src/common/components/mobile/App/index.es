@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
+import qs from 'qs'
 import {
   observable,
   inject,
@@ -30,12 +31,20 @@ export default class App extends Component {
     super(props)
   }
 
+  transition = 'sfr'
+
   static getPreloadedState = async (path, state, {
-    url: dirPath,
+    query: {
+      dirPath,
+    },
     urlPrefix,
     headers,
   }) => {
-    const files = await fileService.readDir(urlPrefix + dirPath, headers)
+    const files = await fileService.readDir(urlPrefix + '/list?' + qs.stringify({
+      dirPath,
+    }), {
+      headers,
+    })
     return {
       ...state,
       fileStore: {
@@ -45,46 +54,35 @@ export default class App extends Component {
     }
   }
 
-  oldPathname = null
-
-  componentWillUpdate (nextProps, nextState) {
-    const {
-      action,
-      pathname,
-    } = nextProps.location
-
-    if (pathname !== this.oldPathname) {
-      const {
-        fileStore: {
-          readDir,
-        },
-        configStore: {
-          baseUrl,
-          restUrl,
-        },
-      } = this.props
-
-      const path = pathname.substr(baseUrl.length)
-      this.oldPathname = pathname
-      readDir(restUrl, path)
-    }
-  }
-
   render () {
     const {
       fileStore: {
         loading,
         dirPath,
+        transition,
         files,
+        parentDir,
+        dirName,
+        changeDir,
+      },
+      configStore: {
+        baseUrl,
       },
     } = this.props
 
     return <Container fill direction='column'>
-      <Container transition='rfr'>
-        <View>
-          <NavBar title='Explorer' amStyle='primary' />
+      <Container transition={transition || 'none'}>
+        <View key={dirPath}>
+          <NavBar title={dirName || 'File Explorer'} amStyle='primary' leftNav={parentDir !== null ? [{
+            component: Link,
+            icon: 'left-nav',
+            title: 'Back',
+            onClick: () => {
+              changeDir(parentDir)
+            },
+          }] : null}/>
           <Container scrollable>
-            <Group header={dirPath} noPadded>
+            <Group header={dirPath || null} noPadded>
               {
                 files && files.length > 0 ? <List>
                   {
@@ -94,30 +92,32 @@ export default class App extends Component {
                       size,
                     }, i) => {
                       let filePath
-                      if (dirPath === '/') {
-                        filePath = dirPath + filename
-                      } else {
+                      if (dirPath) {
                         filePath = dirPath + '/' + filename
+                      } else {
+                        filePath = filename
                       }
                       return <List.Item key={filePath}
                         title={filename}
                         linkComponent={type === 'directory' ? Link : null}
                         linkProps={{
-                          to: filePath,
+                          onClick: () => {
+                            changeDir(filePath)
+                          }
                         }}
                       />
                     })
                   }
                 </List> : null
               }
-              <Modal role='loading' isOpen={loading}></Modal>
             </Group>
           </Container>
+          <Modal role='loading' isOpen={loading} />
         </View>
       </Container>
       <TabBar>
-        <TabBar.Item selected icon="home" />
-        <TabBar.Item icon="info" badge={1} />
+        <TabBar.Item selected icon="list" />
+        <TabBar.Item icon="info" badge={0} />
       </TabBar>
     </Container>
   }

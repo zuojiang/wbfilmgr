@@ -1,7 +1,4 @@
-export default async function (...args) {
-  let state = args.shift()
-  const routes = args.shift()
-
+export default async function (state, routes, ...args) {
   for(let {
     path,
     component: {

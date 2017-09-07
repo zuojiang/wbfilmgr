@@ -7,7 +7,7 @@ const router = express.Router()
 const cwd = process.cwd()
 
 router.use((req, res, next) => {
-  res.locals.path = Path.join(cwd, req.url)
+  res.locals.path = Path.join(cwd, req.query.dirPath || '')
   next()
 })
 
@@ -15,7 +15,7 @@ router.use((req, res, next) => {
 //
 // })
 
-router.get('*', async (req, res, next) => {
+router.get('/list', async (req, res, next) => {
   const {path} = res.locals
 
   try {
@@ -37,7 +37,7 @@ router.get('*', async (req, res, next) => {
       } else if (a.type === 'file' && b.type === 'directory') {
         return 1
       }
-      return 0
+      return a.filename > b.filename ? 1 : -1
     })
     res.json({data})
   } catch (e) {
@@ -45,16 +45,22 @@ router.get('*', async (req, res, next) => {
   }
 })
 
-router.delete('*', async (req, res, next) => {
+router.delete('/remove', async (req, res, next) => {
 
 })
 
-router.post('*', async (req, res, next) => {
+router.post('/new', async (req, res, next) => {
 
 })
 
-router.put('*', async (req, res, next) => {
+router.put('/rename', async (req, res, next) => {
 
+})
+
+router.use((err, req, res, next) => {
+  res.json({
+    errMsg: err.message,
+  })
 })
 
 export default router

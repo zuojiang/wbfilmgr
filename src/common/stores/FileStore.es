@@ -1,3 +1,4 @@
+import qs from 'qs'
 import {
   observable,
   computed,
@@ -18,20 +19,59 @@ export default class FileStore {
 
   @observable files = null
 
-  @observable dirPath = null
+  @observable dirPath = ''
 
   @observable loading = false
 
-  readDir = async (restUrl, path) => {
-    const timer = setTimeout(() => {
-      this.loading = true
-    }, 100)
-    const files = await fileService.readDir(restUrl + path)
-    clearTimeout(timer)
-    runInAction(() => {
-      this.files = files
-      this.dirPath = path
-      this.loading = false
-    })
+  @observable transition = null
+
+  @computed get parentDir () {
+    if (this.dirPath) {
+      const paths = this.dirPath.split('/')
+      paths.pop()
+      return paths.length === 1 ? paths[0] : paths.join('/')
+    }
+    return null
   }
+
+  @computed get dirName () {
+    if (this.dirPath) {
+      const paths = this.dirPath.split('/')
+      return paths.pop()
+    }
+    return ''
+  }
+
+  changeDir = (dirPath) => {
+    if (this.dirPath !== dirPath && this.loading === false) {
+      const transition = dirPath.length > this.dirPath.length ? 'sfr' : 'rfr'
+      this.readDir(dirPath, transition).catch(e => {
+        console.error(e.stack)
+      })
+    }
+  }
+
+  readDir = async (dirPath, transition = null) => {
+    const {
+      restUrl,
+    } = this.stores.configStore
+
+    this.loading = true
+    try {
+      const files = await fileService.readDir(restUrl + '/list?' + qs.stringify({
+        dirPath,
+      }))
+      this.loading = false
+      runInAction(() => {
+        this.files = files
+        // TODO: fade effect
+        this.transition = files.length > 50 ? 'fade' : transition
+        this.dirPath = dirPath
+      })
+    } catch (e) {
+      this.loading = false
+      throw e
+    }
+  }
+
 }

@@ -1,3 +1,25 @@
-.layout {
-  height: 100%;
+:global {
+  .list {
+    .item-linked {
+      @util word-wrap;
+    }
+  }
+
+  .view-transition-fade-enter {
+    opacity: 0.01;
+  }
+
+  .view-transition-fade-enter.view-transition-fade-enter-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+  }
+
+  .view-transition-fade-leave {
+    opacity: 1;
+  }
+
+  .view-transition-fade-leave.view-transition-fade-leave-active {
+    opacity: 0.01;
+    transition: opacity 300ms ease-in;
+  }
 }
