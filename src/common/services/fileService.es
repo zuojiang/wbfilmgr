@@ -14,6 +14,24 @@ export async function readDir ({
   return data
 }
 
+export async function make ({
+  urlPrefix,
+  dirPath,
+  dirName,
+}) {
+  const { data } = await fetch(urlPrefix + '/make', {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      dirPath,
+      dirName,
+    })
+  })
+  return data
+}
+
 export async function remove ({
   urlPrefix,
   dirPath,
@@ -30,6 +48,24 @@ export async function remove ({
       files,
       forever,
     })
+  })
+  return data
+}
+
+export async function upload ({
+  urlPrefix,
+  dirPath,
+  files,
+}) {
+  const body = new FormData()
+  for(let file of files) {
+    body.append('files', file)
+  }
+  const { data } = await fetch(urlPrefix + '/upload?' + qs.stringify({
+    dirPath,
+  }), {
+    method: 'post',
+    body,
   })
   return data
 }

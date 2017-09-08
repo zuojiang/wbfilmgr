@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import {
   observable,
   computed,
@@ -21,28 +21,20 @@ import {
   Icon,
 } from 'amazeui-touch'
 
+import BaseModal from '../BaseModal'
 import css from './style.css'
 
 @observer
-export default class SelectFileModal extends Component {
+export default class SelectFileModal extends BaseModal {
   constructor(props) {
     super(props)
   }
 
-  @observable visible = false
-
   @observable files = null
-
-  @observable onClosed = null
 
   @action open (files) {
     this.files = files
     this.visible = true
-  }
-
-  @action close (onClosed = null) {
-    this.onClosed = onClosed
-    this.visible = false
   }
 
   list = []

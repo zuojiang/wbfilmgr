@@ -4,6 +4,7 @@ import {
   computed,
   action,
   runInAction,
+  toJS,
 } from 'mobx'
 import {
   inject,
@@ -11,29 +12,42 @@ import {
   Observer,
 } from 'mobx-react'
 import {
+  Container,
   Modal,
+  Field,
+  Button,
 } from 'amazeui-touch'
 
 import BaseModal from '../BaseModal'
 
 @observer
-export default class ActionSheetModal extends BaseModal {
+export default class PromptModal extends BaseModal {
   constructor(props) {
     super(props)
   }
 
+  field = null
+
   render () {
+    const {
+      onAction,
+      title,
+      desc,
+      confirmText = 'OK',
+      cancelText = 'Cancel',
+    } = this.props
     return <Modal
-      role='actions'
+      role='prompt'
+      title={title}
+      confirmText={confirmText}
+      cancelText={cancelText}
       isOpen={this.visible}
-      cancelText='Cancel'
-      closeViaBackdrop
       onClosed={() => this.onClosed && this.onClosed()}
       onDismiss={() => this.close()}
+      onAction={evt => onAction(evt)}
     >
-      <div className='modal-actions-group'>
-        {this.props.children}
-      </div>
+      {desc}
+      <Field placeholder='' ref={el => this.field = el} />
     </Modal>
   }
 }

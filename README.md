@@ -6,10 +6,5 @@ http://t.amazeui.org/#/docs/getting-started?_k=s2vazp
 
 ## TODO
 
-npm-run-all -p
-test -- rename --> demo
-
-### merge
-preloadState(state, routes)
-ConfigStore
-fetch
+remove observable from mbox-react
+import {toJS} from 'mbox'

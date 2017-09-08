@@ -92,4 +92,42 @@ export default class FileStore {
     }
   }
 
+  upload = async (dirPath, files) => {
+    const {
+      restUrl,
+    } = this.stores.configStore
+
+    this.loading = true
+    try {
+      return await fileService.upload({
+        urlPrefix: restUrl,
+        dirPath,
+        files,
+      })
+    } catch (e) {
+      this.loading = false
+      throw e
+    }
+  }
+
+  makeDir = async (dirPath, dirName) => {
+    if (!dirName) {
+      return
+    }
+    const {
+      restUrl,
+    } = this.stores.configStore
+
+    this.loading = true
+    try {
+      return await fileService.make({
+        urlPrefix: restUrl,
+        dirPath,
+        dirName,
+      })
+    } catch (e) {
+      this.loading = false
+      throw e
+    }
+  }
 }

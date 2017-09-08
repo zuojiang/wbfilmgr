@@ -33,6 +33,8 @@ import {
 
 import ActionSheetModal from '../ActionSheetModal'
 import SelectFileModal from '../SelectFileModal'
+import UploadFileModal from '../UploadFileModal'
+import PromptModal from '../PromptModal'
 
 @inject('configStore', 'fileStore')
 @observer
@@ -46,6 +48,10 @@ export default class App extends Component {
   actionSheetModal = null
 
   selectFileModal = null
+
+  uploadFileModal = null
+
+  makeDirPromptModal = null
 
   static getPreloadedState = async (path, state, {
     query: {
@@ -85,6 +91,8 @@ export default class App extends Component {
       readDir,
       changeDir,
       remove,
+      upload,
+      makeDir,
     } = fileStore
 
     const files = toJS(fileStore.files)
@@ -142,24 +150,23 @@ export default class App extends Component {
           </Container>
         </View>
       </Container>
-      <TabBar>
+      {/* <TabBar>
         <TabBar.Item selected icon="list" />
         <TabBar.Item icon="info" badge={0} />
-      </TabBar>
-      <Modal role='loading' isOpen={loading} />
+      </TabBar> */}
       <ActionSheetModal ref={el => this.actionSheetModal = el}>
         <List>
           <List.Item>
             <Link className={css.actionSheetLink} onClick={() => {
               this.actionSheetModal.close(() => {
-                alert('developing...')
+                this.makeDirPromptModal.open()
               })
             }}>New Folder</Link>
           </List.Item>
           <List.Item>
             <Link className={css.actionSheetLink} onClick={() => {
               this.actionSheetModal.close(() => {
-                alert('developing...')
+                this.uploadFileModal.open()
               })
             }}>Upload Files</Link>
           </List.Item>
@@ -181,6 +188,27 @@ export default class App extends Component {
           })
         }}
       />
+      <UploadFileModal ref={el => this.uploadFileModal = el}
+        onUpload={files => {
+          upload(dirPath, files).then(length => {
+            this.uploadFileModal.close(() => {
+              readDir(dirPath)
+            })
+          })
+        }}
+      />
+      <PromptModal ref={el => this.makeDirPromptModal = el}
+        title='New Folder'
+        desc='Enter the path for the new folder.'
+        onAction={dirName => {
+          makeDir(dirPath, dirName).then(() => {
+            this.makeDirPromptModal.close(() => {
+              readDir(dirPath)
+            })
+          })
+        }}
+      />
+      <Modal role='loading' isOpen={loading} />
     </Container>
   }
 }
