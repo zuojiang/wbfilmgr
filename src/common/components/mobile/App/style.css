@@ -1,8 +1,24 @@
+.action-sheet-link {
+  color: #333;
+  flex: 1;
+}
+
 :global {
   .list {
     .item-linked {
       @util word-wrap;
     }
+  }
+
+  .navbar {
+    line-height: normal;
+    &-title {
+      @util truncate;
+    }
+  }
+
+  .group-header {
+    @util word-wrap;
   }
 
   .view-transition-fade-enter {

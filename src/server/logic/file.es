@@ -2,12 +2,14 @@ import Path from 'path'
 import express from 'express'
 import fs from 'fs-extra-promise'
 import prettyBytes from 'pretty-bytes'
+import del from 'del'
+import trash from 'trash'
 
 const router = express.Router()
 const cwd = process.cwd()
 
 router.use((req, res, next) => {
-  res.locals.path = Path.join(cwd, req.query.dirPath || '')
+  res.locals.path = Path.join(cwd, req.body.dirPath || req.query.dirPath || '')
   next()
 })
 
@@ -46,7 +48,24 @@ router.get('/list', async (req, res, next) => {
 })
 
 router.delete('/remove', async (req, res, next) => {
+  const {path} = res.locals
+  const {
+    files,
+    forever,
+  } = req.body
 
+  if (files && files.length > 0) {
+    const remove = forever ? del : trash
+    const paths = files.map(filename => Path.join(path, filename))
+    try {
+      const data = await remove(paths)
+      res.json({data})
+    } catch(e) {
+      next(e)
+    }
+  } else {
+    res.json({data: 0})
+  }
 })
 
 router.post('/new', async (req, res, next) => {

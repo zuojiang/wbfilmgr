@@ -1,4 +1,3 @@
-import qs from 'qs'
 import {
   observable,
   computed,
@@ -58,15 +57,34 @@ export default class FileStore {
 
     this.loading = true
     try {
-      const files = await fileService.readDir(restUrl + '/list?' + qs.stringify({
+      const files = await fileService.readDir({
+        urlPrefix: restUrl,
         dirPath,
-      }))
+      })
       this.loading = false
       runInAction(() => {
         this.files = files
-        // TODO: fade effect
         this.transition = files.length > 50 ? 'fade' : transition
         this.dirPath = dirPath
+      })
+    } catch (e) {
+      this.loading = false
+      throw e
+    }
+  }
+
+  remove = async (dirPath, files, forever) => {
+    const {
+      restUrl,
+    } = this.stores.configStore
+
+    this.loading = true
+    try {
+      return await fileService.remove({
+        urlPrefix: restUrl,
+        dirPath,
+        files,
+        forever,
       })
     } catch (e) {
       this.loading = false

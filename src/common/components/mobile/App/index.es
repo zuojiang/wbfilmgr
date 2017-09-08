@@ -3,6 +3,12 @@ import { Link } from 'react-router'
 import qs from 'qs'
 import {
   observable,
+  computed,
+  action,
+  runInAction,
+  toJS,
+} from 'mobx'
+import {
   inject,
   observer,
   Observer,
@@ -17,12 +23,16 @@ import {
   TabBar,
   Icon,
   Badge,
+  Field,
 } from 'amazeui-touch'
 
 import css from './style.css'
 import {
   fileService,
 } from '~/common/services/'
+
+import ActionSheetModal from '../ActionSheetModal'
+import SelectFileModal from '../SelectFileModal'
 
 @inject('configStore', 'fileStore')
 @observer
@@ -33,6 +43,10 @@ export default class App extends Component {
 
   transition = 'sfr'
 
+  actionSheetModal = null
+
+  selectFileModal = null
+
   static getPreloadedState = async (path, state, {
     query: {
       dirPath,
@@ -40,9 +54,9 @@ export default class App extends Component {
     urlPrefix,
     headers,
   }) => {
-    const files = await fileService.readDir(urlPrefix + '/list?' + qs.stringify({
+    const files = await fileService.readDir({
+      urlPrefix,
       dirPath,
-    }), {
       headers,
     })
     return {
@@ -56,31 +70,45 @@ export default class App extends Component {
 
   render () {
     const {
-      fileStore: {
-        loading,
-        dirPath,
-        transition,
-        files,
-        parentDir,
-        dirName,
-        changeDir,
-      },
+      fileStore,
       configStore: {
         baseUrl,
       },
     } = this.props
 
+    const {
+      loading,
+      dirPath,
+      transition,
+      parentDir,
+      dirName,
+      readDir,
+      changeDir,
+      remove,
+    } = fileStore
+
+    const files = toJS(fileStore.files)
+
     return <Container fill direction='column'>
       <Container transition={transition || 'none'}>
         <View key={dirPath}>
-          <NavBar title={dirName || 'File Explorer'} amStyle='primary' leftNav={parentDir !== null ? [{
-            component: Link,
-            icon: 'left-nav',
-            title: 'Back',
-            onClick: () => {
-              changeDir(parentDir)
-            },
-          }] : null}/>
+          <NavBar title={dirName || 'File Explorer'}
+            amStyle='primary'
+            leftNav={parentDir !== null ? [{
+              component: Link,
+              icon: 'left-nav',
+              onClick: () => {
+                changeDir(parentDir)
+              },
+            }] : null}
+            rightNav={[{
+              component: Link,
+              icon: 'more',
+              onClick: () => {
+                this.actionSheetModal.open()
+              }
+            }]}
+          />
           <Container scrollable>
             <Group header={dirPath || null} noPadded>
               {
@@ -112,13 +140,47 @@ export default class App extends Component {
               }
             </Group>
           </Container>
-          <Modal role='loading' isOpen={loading} />
         </View>
       </Container>
       <TabBar>
         <TabBar.Item selected icon="list" />
         <TabBar.Item icon="info" badge={0} />
       </TabBar>
+      <Modal role='loading' isOpen={loading} />
+      <ActionSheetModal ref={el => this.actionSheetModal = el}>
+        <List>
+          <List.Item>
+            <Link className={css.actionSheetLink} onClick={() => {
+              this.actionSheetModal.close(() => {
+                alert('developing...')
+              })
+            }}>New Folder</Link>
+          </List.Item>
+          <List.Item>
+            <Link className={css.actionSheetLink} onClick={() => {
+              this.actionSheetModal.close(() => {
+                alert('developing...')
+              })
+            }}>Upload Files</Link>
+          </List.Item>
+          <List.Item>
+            <Link className={css.actionSheetLink} onClick={() => {
+              this.actionSheetModal.close(() => {
+                this.selectFileModal.open(files)
+              })
+            }}>Select</Link>
+          </List.Item>
+        </List>
+      </ActionSheetModal>
+      <SelectFileModal ref={el => this.selectFileModal = el}
+        onDelete={({files, forever}) => {
+          remove(dirPath, files, forever).then(length => {
+            this.selectFileModal.close(() => {
+              readDir(dirPath)
+            })
+          })
+        }}
+      />
     </Container>
   }
 }

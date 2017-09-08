@@ -1,0 +1,33 @@
+.popup {
+  :global {
+    .popup-inner {
+      position: relative;
+    }
+
+    .popup-body {
+      padding: 0 !important;
+      position: absolute;
+      top: 2.75rem;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .list {
+      margin: 0 !important;
+    }
+
+    .item:first-child {
+      border-top: none !important;
+    }
+
+    .btn-group {
+      margin: 0;
+    }
+
+    .btn {
+      height: 100%;
+    }
+  }
+}
