@@ -65,10 +65,14 @@ export default class SelectFileModal extends BaseModal {
                     key={i}
                   >
                     <Field
-                      ref={field => this.list.push({
-                        field,
-                        file,
-                      })}
+                      ref={field => {
+                        if (field) {
+                          this.list.push({
+                            field,
+                            file,
+                          })
+                        }
+                      }}
                       label={file.filename}
                       type="checkbox"
                     />

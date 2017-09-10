@@ -1,10 +1,17 @@
-##
+## wbfilmgr
 
-https://ant.design/index-cn
-http://amazeui.org/react/
-http://t.amazeui.org/#/docs/getting-started?_k=s2vazp
+### Description
 
-## TODO
+A web based file manager.
 
-remove observable from mbox-react
-import {toJS} from 'mbox'
+![qrdoe](screenshots/terminal.png)
+
+![actions](screenshots/actions.png)
+
+![select](screenshots/selectfile.png)
+
+### Usage
+```sh
+$ npm install wbfilmgr --global
+$ wbfilmgr /etc
+```

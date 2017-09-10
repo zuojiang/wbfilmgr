@@ -100,13 +100,13 @@ export default class App extends Component {
     return <Container fill direction='column'>
       <Container transition={transition || 'none'}>
         <View key={dirPath}>
-          <NavBar title={dirName || 'File Explorer'}
+          <NavBar title={dirName || 'File Manager'}
             amStyle='primary'
             leftNav={parentDir !== null ? [{
               component: Link,
               icon: 'left-nav',
               onClick: () => {
-                changeDir(parentDir)
+                changeDir(parentDir).catch(err => alert(err.message))
               },
             }] : null}
             rightNav={[{
@@ -126,6 +126,7 @@ export default class App extends Component {
                       filename,
                       type,
                       size,
+                      birthtime,
                     }, i) => {
                       let filePath
                       if (dirPath) {
@@ -133,15 +134,27 @@ export default class App extends Component {
                       } else {
                         filePath = filename
                       }
-                      return <List.Item key={filePath}
-                        title={filename}
-                        linkComponent={type === 'directory' ? Link : null}
-                        linkProps={{
-                          onClick: () => {
-                            changeDir(filePath)
-                          }
-                        }}
-                      />
+
+                      if (type === 'directory') {
+                        return <List.Item key={filePath}
+                          title={filename}
+                          linkComponent={Link}
+                          linkProps={{
+                            onClick: () => {
+                              changeDir(filePath).catch(err => alert(err.message))
+                            }
+                          }}
+                        />
+                      } else if (type === 'file') {
+                        return <List.Item key={filePath}
+                          title={filename}
+                          after={<DownloadLink fileName={filename} size={size} />}
+                        />
+                      } else {
+                        return <List.Item key={filePath}
+                          title={filename}
+                        />
+                      }
                     })
                   }
                 </List> : null
@@ -182,9 +195,15 @@ export default class App extends Component {
       <SelectFileModal ref={el => this.selectFileModal = el}
         onDelete={({files, forever}) => {
           remove(dirPath, files, forever).then(length => {
-            this.selectFileModal.close(() => {
-              readDir(dirPath)
-            })
+            if (length > 0) {
+              this.selectFileModal.close(() => {
+                readDir(dirPath)
+              })
+            } else {
+              alert('No files have been removed!')
+            }
+          }, err => {
+            alert(err.message)
           })
         }}
       />
@@ -192,8 +211,10 @@ export default class App extends Component {
         onUpload={files => {
           upload(dirPath, files).then(length => {
             this.uploadFileModal.close(() => {
-              readDir(dirPath)
+              length > 0 && readDir(dirPath)
             })
+          }, err => {
+            alert(err.message)
           })
         }}
       />
@@ -201,14 +222,54 @@ export default class App extends Component {
         title='New Folder'
         desc='Enter the path for the new folder.'
         onAction={dirName => {
-          makeDir(dirPath, dirName).then(() => {
-            this.makeDirPromptModal.close(() => {
-              readDir(dirPath)
+          if (dirName === null) {
+            this.makeDirPromptModal.close()
+          } else if (dirName) {
+            makeDir(dirPath, dirName).then(length => {
+              this.makeDirPromptModal.close(() => {
+                length > 0 && readDir(dirPath)
+              })
+            }, err => {
+              alert(err.message)
             })
-          })
+          }
         }}
       />
       <Modal role='loading' isOpen={loading} />
     </Container>
+  }
+}
+
+@inject('configStore', 'fileStore')
+@observer
+class DownloadLink extends Component {
+  constructor (props) {
+    super(props)
+  }
+
+  render () {
+
+    const {
+      fileName,
+      size,
+      fileStore: {
+        dirPath,
+      },
+      configStore: {
+        restUrl,
+      },
+    } = this.props
+
+    let url = restUrl +'/download?'+ qs.stringify({
+      fileName,
+      dirPath,
+    })
+
+    return <div>
+      <span className={css.fileSize}>{size}</span>
+      <a className='item-icon icon' href={url}>
+        <Icon name='download' />
+      </a>
+    </div>
   }
 }

@@ -19,8 +19,10 @@ export default function (url, {
       return result
     })
   }), new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error('Request time out'))
-    }, timeout)
+    if (timeout > 0) {
+      setTimeout(() => {
+        reject(new Error('Request time out'))
+      }, timeout)
+    }
   })])
 }

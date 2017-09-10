@@ -13,8 +13,10 @@ import {
 } from 'mobx-react'
 import {
   Container,
+  Group,
   Modal,
   Field,
+  ButtonGroup,
   Button,
 } from 'amazeui-touch'
 
@@ -26,16 +28,21 @@ export default class UploadFileModal extends BaseModal {
     super(props)
   }
 
-  input = null
+  list = []
 
   upload () {
-    const files = this.input.files
+    let files = []
+    for(let input of this.list) {
+      for(let file of input.files)
+      files.push(file)
+    }
     if (files.length) {
       this.props.onUpload(files)
     }
   }
 
   render () {
+    this.list = []
     return <Modal
       role='popup'
       title='Upload Files'
@@ -43,15 +50,34 @@ export default class UploadFileModal extends BaseModal {
       onClosed={() => this.onClosed && this.onClosed()}
       onDismiss={() => this.close()}
     >
-      <Container scrollable>
-        <input ref={el => this.input = el}
-          type="file"
-          accept="image/*"
-          multiple
-        />
-        <Button amStyle="primary" block
-          onClick={() => this.upload()}
-        >Upload</Button>
+      <Container direction='column' fill>
+        <Container scrollable>
+          <Group header='*/*'>
+            <input ref={el => this.list.push(el)}
+              type="file"
+              multiple
+            />
+          </Group>
+          <Group header='image/*'>
+            <input ref={el => this.list.push(el)}
+              type="file"
+              accept='image/*'
+              multiple
+            />
+          </Group>
+          <Group header='text/*'>
+            <input ref={el => this.list.push(el)}
+              type="file"
+              accept='text/*'
+              multiple
+            />
+          </Group>
+        </Container>
+        <ButtonGroup>
+          <Button amStyle="primary" block
+            onClick={() => this.upload()}
+          >Upload</Button>
+        </ButtonGroup>
       </Container>
     </Modal>
   }

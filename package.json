@@ -1,10 +1,16 @@
 {
-  "name": "react-ssr",
+  "name": "wbfilmgr",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A web based file manager.",
+  "keywords": [
+    "http",
+    "web",
+    "file",
+    "manager",
+    "pc"
+  ],
   "scripts": {
-    "start": "better-npm-run start",
+    "start": "node ./bin/cli.js",
     "test": "better-npm-run test",
     "test:server": "babel-watch -w ./src -e '.js,.es,.css,.pug' ./src/server/index.es",
     "test:client": "webpack-dev-server --progress",
@@ -14,12 +20,6 @@
     "clean": "rm -rf ./out/*"
   },
   "betterScripts": {
-    "start": {
-      "command": "node ./out/server/index.js",
-      "env": {
-        "NODE_ENV": "test"
-      }
-    },
     "test": {
       "command": "npm-run-all -p test:*",
       "env": {
@@ -27,8 +27,15 @@
       }
     }
   },
-  "author": "",
-  "license": "ISC",
+  "bin": {
+    "wbfilmgr": "./bin/cli.js"
+  },
+  "preferGlobal": true,
+  "author": {
+    "name": "ZuoJiang Wang",
+    "email": "zuojiang.wang@gmail.com"
+  },
+  "license": "MIT",
   "devDependencies": {
     "autoprefixer": "^7.1.2",
     "babel-cli": "^6.24.1",
@@ -61,6 +68,7 @@
     "webpack-dev-server": "^2.7.1"
   },
   "dependencies": {
+    "amazeui-touch": "^1.0.0",
     "antd": "^2.12.8",
     "body-parser": "^1.17.2",
     "busboy": "^0.2.14",
@@ -81,6 +89,7 @@
     "qrcode-terminal": "^0.11.0",
     "qs": "^6.5.0",
     "react": "^15.6.1",
+    "react-addons-css-transition-group": "^15.6.0",
     "react-dom": "^15.6.1",
     "react-router": "^3.0.5",
     "serve-favicon": "^2.4.3",

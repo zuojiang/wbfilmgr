@@ -38,6 +38,7 @@ app.set('x-powered-by', false)
 app.set('views', Path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 app.engine('pug', pug.__express)
+app.set('cwd', process.cwd())
 
 app.locals = {
   baseUrl,
@@ -62,6 +63,13 @@ if (env === 'development') {
     pathRewrite: {},
     headers: {},
   }))
+  app.use((req, res, next) => {
+    const {cwd} = req.query
+    if (cwd) {
+      app.set('cwd', cwd)
+    }
+    next()
+  })
 }
 
 app.use(favicon(Path.join(__dirname, 'public', 'favicon.ico')))
@@ -73,14 +81,14 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: false
 }))
-app.use(session({
-  secret: sessionSecret,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    secure: false,
-  }
-}))
+// app.use(session({
+//   secret: sessionSecret,
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: {
+//     secure: false,
+//   }
+// }))
 app.use(useragent.express())
 
 app.use(restUrl, require('./logic/file').default)
@@ -163,3 +171,5 @@ app.listen(httpPort, () => {
   }
   console.log(`\n${url}\n`)
 })
+
+export default app

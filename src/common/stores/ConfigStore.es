@@ -5,13 +5,13 @@ import {
   runInAction,
 } from 'mobx'
 
-export default class ConfigStore {
+import BaseStore from './BaseStore'
+
+export default class ConfigStore extends BaseStore {
   constructor(data) {
-    for(let name in data) {
-      this[name] = data[name]
-    }
+    super(data)
   }
 
-  baseUrl = ''
-  restUrl = ''
+  @observable baseUrl = ''
+  @observable restUrl = ''
 }

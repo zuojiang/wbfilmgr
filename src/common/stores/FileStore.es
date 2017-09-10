@@ -8,12 +8,11 @@ import {
 import {
   fileService,
 } from '~/common/services'
+import BaseStore from './BaseStore'
 
-export default class FileStore {
+export default class FileStore extends BaseStore {
   constructor(data) {
-    for(let name in data) {
-      this[name] = data[name]
-    }
+    super(data)
   }
 
   @observable files = null
@@ -41,12 +40,10 @@ export default class FileStore {
     return ''
   }
 
-  changeDir = (dirPath) => {
+  changeDir = async (dirPath) => {
     if (this.dirPath !== dirPath && this.loading === false) {
       const transition = dirPath.length > this.dirPath.length ? 'sfr' : 'rfr'
-      this.readDir(dirPath, transition).catch(e => {
-        console.error(e.stack)
-      })
+      await this.readDir(dirPath, transition)
     }
   }
 
@@ -87,8 +84,9 @@ export default class FileStore {
         forever,
       })
     } catch (e) {
-      this.loading = false
       throw e
+    } finally {
+      this.loading = false
     }
   }
 
@@ -105,15 +103,13 @@ export default class FileStore {
         files,
       })
     } catch (e) {
-      this.loading = false
       throw e
+    } finally {
+      this.loading = false
     }
   }
 
   makeDir = async (dirPath, dirName) => {
-    if (!dirName) {
-      return
-    }
     const {
       restUrl,
     } = this.stores.configStore
@@ -126,8 +122,9 @@ export default class FileStore {
         dirName,
       })
     } catch (e) {
-      this.loading = false
       throw e
+    } finally {
+      this.loading = false
     }
   }
 }

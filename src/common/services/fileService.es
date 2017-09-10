@@ -66,6 +66,7 @@ export async function upload ({
   }), {
     method: 'post',
     body,
+    timeout: 0,
   })
   return data
 }
