@@ -67,8 +67,15 @@ router.delete('/remove', async (req, res, next) => {
     let paths = files.map(filename => Path.join(absPath, filename))
     try {
       paths = await remove(paths)
+      let data = 0
+      if (paths) {
+        data = paths.length
+      } else if (paths === '') {
+        // windows
+        data = 1
+      }
       res.json({
-        data: paths.length,
+        data,
       })
     } catch(e) {
       next(e)

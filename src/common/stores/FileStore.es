@@ -47,6 +47,12 @@ export default class FileStore extends BaseStore {
     }
   }
 
+  refreshDir = async (dirPath) => {
+    if (this.loading === false) {
+      await this.readDir(dirPath || '')
+    }
+  }
+
   readDir = async (dirPath, transition = null) => {
     const {
       restUrl,

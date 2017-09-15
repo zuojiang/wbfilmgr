@@ -90,6 +90,7 @@ export default class App extends Component {
       dirName,
       readDir,
       changeDir,
+      refreshDir,
       remove,
       upload,
       makeDir,
@@ -110,6 +111,12 @@ export default class App extends Component {
               },
             }] : null}
             rightNav={[{
+              component: Link,
+              icon: 'refresh',
+              onClick: () => {
+                refreshDir(dirPath).catch(err => alert(err.message))
+              }
+            }, {
               component: Link,
               icon: 'more',
               onClick: () => {
