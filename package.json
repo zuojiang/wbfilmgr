@@ -17,7 +17,7 @@
     "compile": "npm-run-all clean compile:server compile:client",
     "compile:server": "babel ./src --ignore ./src/client -D --out-dir ./out",
     "compile:client": "webpack --progress -p",
-    "clean": "rm -rf ./out/*"
+    "clean": "del-cli ./out/*"
   },
   "betterScripts": {
     "test": {
@@ -36,6 +36,11 @@
     "email": "zuojiang.wang@gmail.com"
   },
   "license": "MIT",
+  "homepage": "https://github.com/zuojiang/wbfilmgr/tree/1.x.x#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zuojiang/wbfilmgr.git"
+  },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
     "babel-cli": "^6.24.1",
@@ -54,6 +59,7 @@
     "babel-watch": "^2.0.7",
     "better-npm-run": "^0.1.0",
     "css-loader": "^0.28.5",
+    "del-cli": "^1.1.0",
     "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^0.11.2",
     "npm-run-all": "^4.0.2",

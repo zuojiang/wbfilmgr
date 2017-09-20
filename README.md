@@ -1,14 +1,14 @@
-## wbfilmgr
+# wbfilmgr
 
 ### Description
 
 A web based file manager.
 
-![qrdoe](screenshots/terminal.png)
+![qrdoe](https://raw.githubusercontent.com/zuojiang/wbfilmgr/1.x.x/screenshots/terminal-1.0.0.png)
 
-![actions](screenshots/actions.png)
+![actions](https://raw.githubusercontent.com/zuojiang/wbfilmgr/1.x.x/screenshots/actions-1.0.0.png)
 
-![select](screenshots/selectfile.png)
+![select files](https://raw.githubusercontent.com/zuojiang/wbfilmgr/1.x.x/screenshots/selectfile-1.0.0.png)
 
 ### Usage
 ```sh
