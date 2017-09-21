@@ -164,12 +164,16 @@ app.use((req, res, next) => {
   })
 })
 
-app.listen(httpPort, () => {
-  const url = `http://${ip.address()}:${httpPort}`
-  if (env !== 'development') {
-    qrcode.generate(url)
-  }
-  console.log(`\n${url}\n`)
-})
 
-export default app
+export default new Promise((resolve, reject) => {
+  app.listen(httpPort, (...args) => {
+    const url = `http://${ip.address()}:${httpPort}`
+    if (env !== 'development') {
+      console.log('')
+      qrcode.generate(url)
+    }
+    console.log('')
+    console.log(url)
+    resolve(app)
+  })
+})
