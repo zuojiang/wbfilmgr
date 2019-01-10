@@ -57,16 +57,20 @@ export async function upload ({
   dirPath,
   files,
 }) {
-  const body = new FormData()
-  for(let file of files) {
-    body.append('files', file)
+  let count = 0
+  let promise = Promise.resolve()
+  for (const file of files) {
+    promise = promise.then(() => fetch(urlPrefix + '/upload?' + qs.stringify({
+      dirPath,
+    }), {
+      file,
+      timeout: 0,
+      // chunkSize: 1024,
+      retryMaxCount: 0,
+    }).then(({data}) => {
+      count += data
+    }))
   }
-  const { data } = await fetch(urlPrefix + '/upload?' + qs.stringify({
-    dirPath,
-  }), {
-    method: 'post',
-    body,
-    timeout: 0,
-  })
-  return data
+  await promise
+  return count
 }

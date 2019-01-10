@@ -1,5 +1,5 @@
-import desktopRoutes from './desktop/routes'
 import mobileRoutes from './mobile/routes'
+// import desktopRoutes from './desktop/routes'
 
 export default function (userAgent) {
   return mobileRoutes

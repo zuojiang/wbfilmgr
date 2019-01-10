@@ -7,6 +7,7 @@ import qs from 'qs'
 import Busboy from 'busboy'
 import del from 'del'
 import trash from 'trash'
+import fileSlicer from 'file-slicer'
 
 const router = express.Router()
 
@@ -107,28 +108,13 @@ router.put('/make', async (req, res, next) => {
 //
 // })
 
-router.post('/upload', (req, res, next) => {
-  const {headers} = req
-  const {absPath} = res.locals
-
-  const busboy = new Busboy({
-    headers,
-  })
-
-  let data = 0
-  busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-    file.pipe(fs.createWriteStream(Path.join(absPath, filename), {
-      defaultEncoding: encoding,
-    }))
-    data++
-  })
-
-  busboy.on('finish', () => {
-    res.set({ 'Connection': 'close' })
-    res.json({data})
-  })
-
-   req.pipe(busboy)
+router.post('/upload', fileSlicer.middleware({
+  returnAbsPath ({req, res, name, id}) {
+    const {absPath} = res.locals
+    return Path.join(absPath, name)
+  }
+}), (req, res) => {
+  res.json({data: req.files.length})
 })
 
 router.get('/download', (req, res, next) => {

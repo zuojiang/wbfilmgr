@@ -1,14 +1,20 @@
 import 'es6-promise/auto'
-import fetch from 'isomorphic-fetch'
+import fetch from 'isomorphic-fetch-improve'
+import {postFile} from 'file-slicer'
 
 export default function (url, {
   timeout = 1000 * 60,
+  file = null,
   ...opts,
 } = {}) {
-  return Promise.race([fetch(url, {
+  const options = {
+    timeout,
+    retryMaxCount: 5,
     credentials: 'same-origin',
     ...opts,
-  }).then(response => {
+  }
+  return (file ? postFile(url, file, options) : fetch(url, options))
+  .then(response => {
     if (response.status >= 400) {
       throw new Error('Bad response from server');
     }
@@ -18,11 +24,9 @@ export default function (url, {
       }
       return result
     })
-  }), new Promise((resolve, reject) => {
-    if (timeout > 0) {
-      setTimeout(() => {
-        reject(new Error('Request time out'))
-      }, timeout)
-    }
-  })])
+  }).catch(err => {
+    console.error(err);
+    alert(err.message)
+    throw err
+  })
 }

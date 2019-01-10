@@ -33,8 +33,12 @@ export default class UploadFileModal extends BaseModal {
   upload () {
     let files = []
     for(let input of this.list) {
-      for(let file of input.files)
-      files.push(file)
+      if (!input) {
+        continue
+      }
+      for(let file of input.files) {
+        files.push(file)
+      }
     }
     if (files.length) {
       this.props.onUpload(files)

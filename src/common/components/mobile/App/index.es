@@ -107,14 +107,14 @@ export default class App extends Component {
               component: Link,
               icon: 'left-nav',
               onClick: () => {
-                changeDir(parentDir).catch(err => alert(err.message))
+                changeDir(parentDir)
               },
             }] : null}
             rightNav={[{
               component: Link,
               icon: 'refresh',
               onClick: () => {
-                refreshDir(dirPath).catch(err => alert(err.message))
+                refreshDir(dirPath)
               }
             }, {
               component: Link,
@@ -148,7 +148,7 @@ export default class App extends Component {
                           linkComponent={Link}
                           linkProps={{
                             onClick: () => {
-                              changeDir(filePath).catch(err => alert(err.message))
+                              changeDir(filePath)
                             }
                           }}
                         />
@@ -209,8 +209,6 @@ export default class App extends Component {
             } else {
               alert('No files have been removed!')
             }
-          }, err => {
-            alert(err.message)
           })
         }}
       />
@@ -218,10 +216,16 @@ export default class App extends Component {
         onUpload={files => {
           upload(dirPath, files).then(length => {
             this.uploadFileModal.close(() => {
-              length > 0 && readDir(dirPath)
+              if (length == 0) {
+                alert('No files have been uploaded!')
+              } else {
+                readDir(dirPath)
+                const failCount = files.length - length
+                if (failCount) {
+                  alert(`${length} success, ${failCount} failure`)
+                }
+              }
             })
-          }, err => {
-            alert(err.message)
           })
         }}
       />
@@ -236,8 +240,6 @@ export default class App extends Component {
               this.makeDirPromptModal.close(() => {
                 length > 0 && readDir(dirPath)
               })
-            }, err => {
-              alert(err.message)
             })
           }
         }}

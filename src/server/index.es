@@ -1,7 +1,8 @@
 import Path from 'path'
 import Url from 'url'
 import express from 'express'
-import proxy from 'http-proxy-middleware'
+import webpack from 'webpack'
+import webpackDev from 'webpack-dev-middleware'
 import bodyParser from 'body-parser'
 import favicon from 'serve-favicon'
 import session from 'express-session'
@@ -46,22 +47,10 @@ app.locals = {
 
 if (env === 'development') {
   app.locals.pretty = true
-  const {
-    devServer,
-  } = require('../../webpack.config')
-  app.use([
-    '/res/js/bundle.js',
-    '/res/js/bundle.js.map',
-    '/res/css/bundle.css',
-    '/res/css/bundle.css.map',
-  ], proxy({
-    target: `http://127.0.0.1:${devServer.port}`,
-    changeOrigin: true,
-    onProxyRes: (proxyRes, req, res) => {
-      proxyRes.headers['Access-Control-Allow-Origin'] = '*'
-    },
-    pathRewrite: {},
-    headers: {},
+  const webpackConfig = require('../../webpack.config')
+  webpackConfig.mode = 'development'
+  app.use(webpackDev(webpack(webpackConfig), {
+    logLevel: 'warn',
   }))
   app.use((req, res, next) => {
     const {cwd} = req.query
