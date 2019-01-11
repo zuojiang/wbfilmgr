@@ -3,21 +3,32 @@
 process.env.NODE_ENV = 'production'
 const yargs = require('yargs')
 const fs = require('fs')
-const appPromise = require('../out/server/index.js').default
+const run = require('../out/server/index.js').default
 const checkForUpdate = require('../out/server/checkForUpdate.js').default
 
-const path = yargs.argv._[0]
-
-appPromise.then(app => {
-  if (path) {
-    const stat = fs.statSync(path)
-    if (stat.isDirectory()) {
-      app.set('cwd', path)
-    }
+const {
+  _: [rootDir],
+  notCheckUpdate,
+  ...options
+} = yargs.options({
+  'http-port': {
+    alias: 'p',
+    describe: 'HTTP port',
+    type: 'number',
+  },
+  'not-check-update': {
+    describe: 'Don\'t check latest version',
+    type: 'boolean',
   }
+})
+.strict(true)
+.argv
 
-  console.log('')
-  console.log(app.get('cwd'))
-
-  checkForUpdate()
+run({
+  ...options,
+  rootDir,
+}).then(app => {
+  if (!notCheckUpdate) {
+    checkForUpdate()
+  }
 })

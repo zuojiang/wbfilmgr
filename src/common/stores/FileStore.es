@@ -4,6 +4,8 @@ import {
   action,
   runInAction,
 } from 'mobx'
+import qs from 'qs'
+import fileSaver from 'file-saver'
 
 import {
   fileService,
@@ -14,6 +16,11 @@ export default class FileStore extends BaseStore {
   constructor(data) {
     super(data)
   }
+  directoryActionSheetModal = null
+
+  fileActionSheetModal = null
+
+  @observable currentFile = null
 
   @observable files = null
 
@@ -38,6 +45,38 @@ export default class FileStore extends BaseStore {
       return paths.pop()
     }
     return ''
+  }
+
+  @computed get previewUrl () {
+    if (!this.currentFile) {
+      return '#'
+    }
+    const {
+      baseUrl,
+    } = this.stores.configStore
+    const {
+      fileName,
+    } = this.currentFile
+    return baseUrl +'/serve?'+ qs.stringify({
+      fileName,
+      dirPath: this.dirPath,
+    })
+  }
+
+  @computed get downloadUrl () {
+    if (!this.currentFile) {
+      return '#'
+    }
+    const {
+      restUrl,
+    } = this.stores.configStore
+    const {
+      fileName,
+    } = this.currentFile
+    return restUrl +'/download?'+ qs.stringify({
+      fileName,
+      dirPath: this.dirPath,
+    })
   }
 
   changeDir = async (dirPath) => {
@@ -132,5 +171,9 @@ export default class FileStore extends BaseStore {
     } finally {
       this.loading = false
     }
+  }
+
+  download = () => {
+    fileSaver(this.downloadUrl)
   }
 }

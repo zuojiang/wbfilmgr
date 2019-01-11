@@ -7,6 +7,12 @@
   margin-right: 1ex;
 }
 
+.no-nav {
+  :global(.icon-right-nav){
+    display: none;
+  }
+}
+
 :global {
   .__modal-portal {
     position: relative;

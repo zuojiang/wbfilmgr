@@ -41,7 +41,7 @@ export default class SelectFileModal extends BaseModal {
 
   remove (forever) {
     let files = this.list.filter(({field}) => field.getChecked())
-    files = files.map(({file}) => file.filename)
+    files = files.map(({file}) => file.fileName)
     this.props.onDelete({files, forever})
   }
 
@@ -73,7 +73,7 @@ export default class SelectFileModal extends BaseModal {
                           })
                         }
                       }}
-                      label={file.filename}
+                      label={file.fileName}
                       type="checkbox"
                     />
                   </List.Item>

@@ -2,7 +2,6 @@ import Path from 'path'
 import express from 'express'
 import fs from 'fs-extra-promise'
 import prettyBytes from 'pretty-bytes'
-import contentDisposition from 'content-disposition'
 import qs from 'qs'
 import Busboy from 'busboy'
 import del from 'del'
@@ -12,8 +11,8 @@ import fileSlicer from 'file-slicer'
 const router = express.Router()
 
 router.use((req, res, next) => {
-  const cwd = req.app.get('cwd')
-  res.locals.absPath = Path.join(cwd, req.body.dirPath || req.query.dirPath || '')
+  const {rootDir} = res.app.locals
+  res.locals.absPath = Path.join(rootDir, req.body.dirPath || req.query.dirPath || '')
   next()
 })
 
@@ -23,11 +22,11 @@ router.get('/list', async (req, res, next) => {
   try {
     const files = await fs.readdirAsync(absPath)
     let data = [], stats
-    for(let filename of files) {
+    for(let fileName of files) {
       try {
-        stats = await fs.statAsync(Path.join(absPath, filename))
+        stats = await fs.statAsync(Path.join(absPath, fileName))
         data.push({
-          filename,
+          fileName,
           type: stats.isDirectory() ? 'directory' : 'file',
           order: stats.isDirectory() ? 1 : 2,
           size: prettyBytes(stats.size),
@@ -36,7 +35,7 @@ router.get('/list', async (req, res, next) => {
         })
       } catch (e) {
         data.push({
-          filename,
+          fileName,
           type: 'other',
           order: 3,
         })
@@ -48,7 +47,7 @@ router.get('/list', async (req, res, next) => {
       } else if (a.order > b.order) {
         return 1
       }
-      return a.filename > b.filename ? 1 : -1
+      return a.fileName > b.fileName ? 1 : -1
     })
     res.json({data})
   } catch (e) {
@@ -65,7 +64,7 @@ router.delete('/remove', async (req, res, next) => {
 
   if (files && files.length > 0) {
     const remove = forever ? del : trash
-    let paths = files.map(filename => Path.join(absPath, filename))
+    let paths = files.map(fileName => Path.join(absPath, fileName))
     try {
       paths = await remove(paths)
       let data = 0
@@ -123,29 +122,19 @@ router.get('/download', (req, res, next) => {
     fileName,
   } = req.query
 
-  res.sendFile(Path.join(absPath, fileName), {
+  res.download(Path.join(absPath, fileName), fileName, {
     dotfiles: 'allow',
-    headers: {
-      'Content-Disposition': contentDisposition(fileName),
+  }, err => {
+    if (err) {
+      res.end()
     }
   })
 })
 
 router.use((err, req, res, next) => {
-  if (req.url.indexOf('/download') === 0) {
-    const {
-      dirPath,
-    } = req.query
-    res.redirect((res.app.locals.baseUrl || '/') + qs.stringify({
-      dirPath,
-    }, {
-      addQueryPrefix: true,
-    }))
-  } else {
-    res.json({
-      errMsg: err.message,
-    })
-  }
+  res.json({
+    errMsg: err.message,
+  })
 })
 
 export default router

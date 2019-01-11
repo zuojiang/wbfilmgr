@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
-import qs from 'qs'
 import {
   observable,
   computed,
@@ -44,8 +43,6 @@ export default class App extends Component {
   }
 
   transition = 'sfr'
-
-  actionSheetModal = null
 
   selectFileModal = null
 
@@ -94,6 +91,7 @@ export default class App extends Component {
       remove,
       upload,
       makeDir,
+      previewUrl,
     } = fileStore
 
     const files = toJS(fileStore.files)
@@ -120,7 +118,7 @@ export default class App extends Component {
               component: Link,
               icon: 'more',
               onClick: () => {
-                this.actionSheetModal.open()
+                fileStore.directoryActionSheetModal.open()
               }
             }]}
           />
@@ -129,22 +127,23 @@ export default class App extends Component {
               {
                 files && files.length > 0 ? <List>
                   {
-                    files.map(({
-                      filename,
-                      type,
-                      size,
-                      birthtime,
-                    }, i) => {
+                    files.map((file, i) => {
+                      let {
+                        fileName,
+                        type,
+                        size,
+                        birthtime,
+                      } = file
                       let filePath
                       if (dirPath) {
-                        filePath = dirPath + '/' + filename
+                        filePath = dirPath + '/' + fileName
                       } else {
-                        filePath = filename
+                        filePath = fileName
                       }
 
                       if (type === 'directory') {
                         return <List.Item key={filePath}
-                          title={filename}
+                          title={fileName}
                           linkComponent={Link}
                           linkProps={{
                             onClick: () => {
@@ -154,12 +153,20 @@ export default class App extends Component {
                         />
                       } else if (type === 'file') {
                         return <List.Item key={filePath}
-                          title={filename}
-                          after={<DownloadLink fileName={filename} size={size} />}
+                          title={fileName}
+                          linkComponent={Link}
+                          linkProps={{
+                            className: css.noNav,
+                            onClick: () => {
+                              fileStore.currentFile = file
+                              fileStore.fileActionSheetModal.open()
+                            }
+                          }}
+                          after={<span className={css.fileSize}>{size}</span>}
                         />
                       } else {
                         return <List.Item key={filePath}
-                          title={filename}
+                          title={fileName}
                         />
                       }
                     })
@@ -174,28 +181,43 @@ export default class App extends Component {
         <TabBar.Item selected icon="list" />
         <TabBar.Item icon="info" badge={0} />
       </TabBar> */}
-      <ActionSheetModal ref={el => this.actionSheetModal = el}>
+      <ActionSheetModal ref={el => fileStore.directoryActionSheetModal = el}>
         <List>
           <List.Item>
             <Link className={css.actionSheetLink} onClick={() => {
-              this.actionSheetModal.close(() => {
+              fileStore.directoryActionSheetModal.close(() => {
                 this.makeDirPromptModal.open()
               })
             }}>New Folder</Link>
           </List.Item>
           <List.Item>
             <Link className={css.actionSheetLink} onClick={() => {
-              this.actionSheetModal.close(() => {
+              fileStore.directoryActionSheetModal.close(() => {
                 this.uploadFileModal.open()
               })
             }}>Upload Files</Link>
           </List.Item>
           <List.Item>
             <Link className={css.actionSheetLink} onClick={() => {
-              this.actionSheetModal.close(() => {
+              fileStore.directoryActionSheetModal.close(() => {
                 this.selectFileModal.open(files)
               })
             }}>Select</Link>
+          </List.Item>
+        </List>
+      </ActionSheetModal>
+      <ActionSheetModal ref={el => fileStore.fileActionSheetModal = el}>
+        <List>
+          <List.Item>
+            <Link className={css.actionSheetLink} href={previewUrl} 
+              target='_blank'>Preview</Link>
+          </List.Item>
+          <List.Item>
+            <Link className={css.actionSheetLink} onClick={() => {
+              fileStore.fileActionSheetModal.close(() => {
+                fileStore.download()
+              })
+            }}>Download</Link>
           </List.Item>
         </List>
       </ActionSheetModal>
@@ -246,39 +268,5 @@ export default class App extends Component {
       />
       <Modal role='loading' isOpen={loading} />
     </Container>
-  }
-}
-
-@inject('configStore', 'fileStore')
-@observer
-class DownloadLink extends Component {
-  constructor (props) {
-    super(props)
-  }
-
-  render () {
-
-    const {
-      fileName,
-      size,
-      fileStore: {
-        dirPath,
-      },
-      configStore: {
-        restUrl,
-      },
-    } = this.props
-
-    let url = restUrl +'/download?'+ qs.stringify({
-      fileName,
-      dirPath,
-    })
-
-    return <div>
-      <span className={css.fileSize}>{size}</span>
-      <a className='item-icon icon' href={url}>
-        <Icon name='download' />
-      </a>
-    </div>
   }
 }

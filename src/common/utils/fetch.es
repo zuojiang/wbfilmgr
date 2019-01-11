@@ -26,7 +26,11 @@ export default function (url, {
     })
   }).catch(err => {
     console.error(err);
-    alert(err.message)
+    if (global.alert) {
+      alert(err.message)
+    } else {
+      console.warn(url);
+    }
     throw err
   })
 }
