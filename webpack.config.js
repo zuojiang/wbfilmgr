@@ -1,11 +1,12 @@
 const path = require('path')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   mode: 'production',
   entry: ['./src/client/index.es'],
   output: {
-    path: path.resolve(__dirname, './out/server/public'),
+    path: path.resolve(__dirname, 'out/server/public'),
     filename: `res/js/bundle.js`
   },
   devtool: 'none',
@@ -52,6 +53,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new CopyWebpackPlugin([ 'public' ]),
     new MiniCssExtractPlugin({
       filename: 'res/css/bundle.css',
     }),

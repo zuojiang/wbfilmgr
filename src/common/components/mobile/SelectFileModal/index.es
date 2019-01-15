@@ -45,6 +45,20 @@ export default class SelectFileModal extends BaseModal {
     this.props.onDelete({files, forever})
   }
 
+  rename () {
+    const {
+      fileStore,
+    } = this.props
+    const files = this.list.filter(({field}) => field.getChecked())
+    const {length} = files
+
+    if (length == 1) {
+      this.props.onRename(files[0].file)
+    } else {
+      alert('Please select one file')
+    }
+  }
+
   render () {
     this.list = []
     return <Modal
@@ -82,7 +96,8 @@ export default class SelectFileModal extends BaseModal {
             </List>
           </Container>
           <ButtonGroup justify>
-            <Button amStyle='warning' onClick={() => this.remove(false)}>Move To Trash</Button>
+            <Button amStyle='default' onClick={() => this.rename()}>Rename</Button>
+            <Button amStyle='warning' onClick={() => this.remove(false)}>Trash</Button>
             <Button amStyle='alert' onClick={() => this.remove(true)}>Delete</Button>
           </ButtonGroup>
         </Container>

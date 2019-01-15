@@ -50,6 +50,8 @@ export default class App extends Component {
 
   makeDirPromptModal = null
 
+  renamePromptModal = null
+
   static getPreloadedState = async (path, state, {
     query: {
       dirPath,
@@ -85,6 +87,7 @@ export default class App extends Component {
       transition,
       parentDir,
       dirName,
+      rename,
       readDir,
       changeDir,
       refreshDir,
@@ -209,7 +212,7 @@ export default class App extends Component {
       <ActionSheetModal ref={el => fileStore.fileActionSheetModal = el}>
         <List>
           <List.Item>
-            <Link className={css.actionSheetLink} href={previewUrl} 
+            <Link className={css.actionSheetLink} href={previewUrl}
               target='_blank'>Preview</Link>
           </List.Item>
           <List.Item>
@@ -231,6 +234,12 @@ export default class App extends Component {
             } else {
               alert('No files have been removed!')
             }
+          })
+        }}
+        onRename={file => {
+          this.selectFileModal.close(() => {
+            fileStore.currentFile = file
+            this.renamePromptModal.open()
           })
         }}
       />
@@ -260,6 +269,22 @@ export default class App extends Component {
           } else if (dirName) {
             makeDir(dirPath, dirName).then(length => {
               this.makeDirPromptModal.close(() => {
+                length > 0 && readDir(dirPath)
+              })
+            })
+          }
+        }}
+      />
+      <PromptModal ref={el => this.renamePromptModal = el}
+        title='Rename'
+        desc='Enter the name for the file.'
+        placeholder={fileStore.currentFile && fileStore.currentFile.fileName}
+        onAction={newName => {
+          if (newName === null) {
+            this.renamePromptModal.close()
+          } else if (newName) {
+            rename(dirPath, newName).then(length => {
+              this.renamePromptModal.close(() => {
                 length > 0 && readDir(dirPath)
               })
             })

@@ -35,6 +35,7 @@ export default class PromptModal extends BaseModal {
       desc,
       confirmText = 'OK',
       cancelText = 'Cancel',
+      placeholder = null,
     } = this.props
     return <Modal
       role='prompt'
@@ -47,7 +48,7 @@ export default class PromptModal extends BaseModal {
       onAction={evt => onAction(evt)}
     >
       {desc}
-      <Field placeholder='' ref={el => this.field = el} />
+      <Field placeholder={placeholder} ref={el => this.field = el} />
     </Modal>
   }
 }

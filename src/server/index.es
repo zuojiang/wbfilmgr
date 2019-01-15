@@ -4,8 +4,9 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import favicon from 'serve-favicon'
 import serveHandler from 'serve-handler'
-import session from 'express-session'
+// import session from 'express-session'
 import useragent from 'express-useragent'
+import basicAuth from 'express-basic-auth'
 import portfinder from 'portfinder'
 import pug from 'pug'
 import React from 'react'
@@ -32,6 +33,8 @@ const env = process.env.NODE_ENV || 'test'
 async function main ({
   httpPort,
   rootDir = process.cwd(),
+  title = null,
+  users = null,
 } = {}) {
   if (!httpPort) {
     httpPort = await portfinder.getPortPromise({
@@ -53,6 +56,14 @@ async function main ({
     rootDir,
   }
 
+  if (users) {
+    app.use(basicAuth({
+      users,
+      challenge: true,
+    }))
+  }
+
+  let publicDir
   if (env === 'development') {
     const webpack = require('webpack')
     const webpackDev = require('webpack-dev-middleware')
@@ -62,9 +73,11 @@ async function main ({
     app.use(webpackDev(webpack(webpackConfig), {
       logLevel: 'warn',
     }))
+    publicDir = Path.resolve(__dirname, '../../public')
+  } else {
+    publicDir = Path.resolve(__dirname, 'public')
   }
 
-  const publicDir = Path.resolve(__dirname, '../../public')
   app.use(favicon(Path.join(publicDir, 'favicon.ico')))
   app.use(express.static(publicDir, {
     index: false,
@@ -165,6 +178,7 @@ async function main ({
             </Provider>
           )
           res.render('index', {
+            title,
             appHtml,
             appData: {
               state,
@@ -197,6 +211,7 @@ async function main ({
 if (env == 'development') {
   main({
     rootDir: process.argv[2],
+    // users: {admin: 'admin'},
   })
 }
 

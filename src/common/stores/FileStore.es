@@ -135,25 +135,6 @@ export default class FileStore extends BaseStore {
     }
   }
 
-  upload = async (dirPath, files) => {
-    const {
-      restUrl,
-    } = this.stores.configStore
-
-    this.loading = true
-    try {
-      return await fileService.upload({
-        urlPrefix: restUrl,
-        dirPath,
-        files,
-      })
-    } catch (e) {
-      throw e
-    } finally {
-      this.loading = false
-    }
-  }
-
   makeDir = async (dirPath, dirName) => {
     const {
       restUrl,
@@ -165,6 +146,49 @@ export default class FileStore extends BaseStore {
         urlPrefix: restUrl,
         dirPath,
         dirName,
+      })
+    } catch (e) {
+      throw e
+    } finally {
+      this.loading = false
+    }
+  }
+
+  rename = async (dirPath, newName) => {
+    const {
+      restUrl,
+    } = this.stores.configStore
+
+    const oldName = this.currentFile.fileName
+    if (oldName == newName) {
+      return
+    }
+    this.loading = true
+    try {
+      return await fileService.rename({
+        urlPrefix: restUrl,
+        dirPath,
+        oldName,
+        newName,
+      })
+    } catch (e) {
+      throw e
+    } finally {
+      this.loading = false
+    }
+  }
+
+  upload = async (dirPath, files) => {
+    const {
+      restUrl,
+    } = this.stores.configStore
+
+    this.loading = true
+    try {
+      return await fileService.upload({
+        urlPrefix: restUrl,
+        dirPath,
+        files,
       })
     } catch (e) {
       throw e

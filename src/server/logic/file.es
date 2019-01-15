@@ -103,9 +103,21 @@ router.put('/make', async (req, res, next) => {
   }
 })
 
-// router.put('/rename', async (req, res, next) => {
-//
-// })
+router.put('/rename', async (req, res, next) => {
+  const {absPath} = res.locals
+  const {
+    oldName,
+    newName,
+  } = req.body
+  try {
+    const oldPath = Path.join(absPath, oldName)
+    const newPath = Path.join(absPath, newName)
+    await fs.renameAsync(oldPath, newPath)
+    res.json({data:1})
+  } catch (e) {
+    next(e)
+  }
+})
 
 router.post('/upload', fileSlicer.middleware({
   returnAbsPath ({req, res, name, id}) {

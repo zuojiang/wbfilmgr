@@ -52,6 +52,26 @@ export async function remove ({
   return data
 }
 
+export async function rename ({
+  urlPrefix,
+  dirPath,
+  newName,
+  oldName,
+}) {
+  const { data } = await fetch(urlPrefix + '/rename', {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      dirPath,
+      newName,
+      oldName,
+    })
+  })
+  return data
+}
+
 export async function upload ({
   urlPrefix,
   dirPath,
