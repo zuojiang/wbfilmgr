@@ -1,6 +1,8 @@
-# wbfilmgr
+wbfilmgr
+===
 
-### Description
+Description
+---
 
 A web based file manager.
 
@@ -10,8 +12,18 @@ A web based file manager.
 
 ![select files](https://raw.githubusercontent.com/zuojiang/wbfilmgr/1.x.x/screenshots/selectfile-1.0.0.png)
 
-### Usage
+Usage
+---
 ```sh
 $ npm install wbfilmgr --global
 $ wbfilmgr /etc
+$ wbfilmgr -p 8080 -u users.json
+$ wbfilmgr --help
+```
+
+users.json
+```json
+{
+  "username": "password"
+}
 ```

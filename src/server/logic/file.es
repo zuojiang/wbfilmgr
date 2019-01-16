@@ -6,7 +6,11 @@ import qs from 'qs'
 import Busboy from 'busboy'
 import del from 'del'
 import trash from 'trash'
+import hidefile from 'hidefile'
+import pify from 'pify'
 import fileSlicer from 'file-slicer'
+
+import ignore from '../utils/ignore'
 
 const router = express.Router()
 
@@ -17,34 +21,43 @@ router.use((req, res, next) => {
 })
 
 router.get('/list', async (req, res, next) => {
+  const {rootDir} = res.app.locals
   const {absPath} = res.locals
+
+  const isIgnore = await ignore(rootDir)
 
   try {
     const files = await fs.readdirAsync(absPath)
-    let data = [], stats
+    let data = []
     for(let fileName of files) {
+      const filePath = Path.join(absPath, fileName)
+      if (fileName == 'lost+found' || isIgnore(filePath)) {
+        continue
+      }
       try {
-        stats = await fs.statAsync(Path.join(absPath, fileName))
+        const hidden = await pify(hidefile.isHidden)(filePath)
+        const stats = await fs.statAsync(filePath)
         data.push({
           fileName,
           type: stats.isDirectory() ? 'directory' : 'file',
-          order: stats.isDirectory() ? 1 : 2,
           size: prettyBytes(stats.size),
           birthtime: stats.birthtime,
           modifytime: stats.mtime,
+          hidden,
+          _order: stats.isDirectory() ? 1 : 2,
         })
       } catch (e) {
         data.push({
           fileName,
           type: 'other',
-          order: 3,
+          _order: 3,
         })
       }
     }
     data.sort((a, b) => {
-      if (a.order < b.order) {
+      if (a._order < b._order) {
         return -1
-      } else if (a.order > b.order) {
+      } else if (a._order > b._order) {
         return 1
       }
       return a.fileName > b.fileName ? 1 : -1

@@ -1,10 +1,11 @@
 import Path from 'path'
 import Url from 'url'
+import os from 'os'
 import express from 'express'
 import bodyParser from 'body-parser'
 import favicon from 'serve-favicon'
 import serveHandler from 'serve-handler'
-// import session from 'express-session'
+import session from 'express-session'
 import useragent from 'express-useragent'
 import basicAuth from 'express-basic-auth'
 import portfinder from 'portfinder'
@@ -31,15 +32,21 @@ useStaticRendering(true)
 const env = process.env.NODE_ENV || 'test'
 
 async function main ({
-  httpPort,
   rootDir = process.cwd(),
+  httpPort = null,
   title = null,
   users = null,
 } = {}) {
+  rootDir = Path.normalize(rootDir)
+
   if (!httpPort) {
     httpPort = await portfinder.getPortPromise({
       port: 3000,
     })
+  }
+
+  if (!title) {
+    title = Path.basename(rootDir) || os.hostname()
   }
 
   const baseUrl = ''
@@ -93,7 +100,8 @@ async function main ({
       public: rootDir,
       cleanUrls: false,
     }, {
-      sendError (absolutePath,
+      sendError (
+        absolutePath,
         response,
         acceptsJSON,
         current,
@@ -101,7 +109,7 @@ async function main ({
         config,
         err,
       ) {
-        next(new Error(err && err.message || 'Bad Request'))
+        next(err)
       }
     })
   })
@@ -110,14 +118,14 @@ async function main ({
   app.use(bodyParser.urlencoded({
     extended: false
   }))
-  // app.use(session({
-  //   secret: sessionSecret,
-  //   resave: false,
-  //   saveUninitialized: true,
-  //   cookie: {
-  //     secure: false,
-  //   }
-  // }))
+  app.use(session({
+    secret: 'wbfilmgr',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: false,
+    }
+  }))
   app.use(useragent.express())
 
   app.use(restUrl, require('./logic/file').default)

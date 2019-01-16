@@ -136,6 +136,7 @@ export default class App extends Component {
                         type,
                         size,
                         birthtime,
+                        hidden,
                       } = file
                       let filePath
                       if (dirPath) {
@@ -144,11 +145,14 @@ export default class App extends Component {
                         filePath = fileName
                       }
 
+                      const hiddenFileStyle = hidden ? css.hiddenFile : ''
+
                       if (type === 'directory') {
                         return <List.Item key={filePath}
                           title={fileName}
                           linkComponent={Link}
                           linkProps={{
+                            className: hiddenFileStyle,
                             onClick: () => {
                               changeDir(filePath)
                             }
@@ -159,7 +163,7 @@ export default class App extends Component {
                           title={fileName}
                           linkComponent={Link}
                           linkProps={{
-                            className: css.noNav,
+                            className: [css.noNav, hiddenFileStyle].join(' '),
                             onClick: () => {
                               fileStore.currentFile = file
                               fileStore.fileActionSheetModal.open()

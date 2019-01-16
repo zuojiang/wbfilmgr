@@ -16,7 +16,7 @@ export default function (url, {
   return (file ? postFile(url, file, options) : fetch(url, options))
   .then(response => {
     if (response.status >= 400) {
-      throw new Error('Bad response from server');
+      throw new Error(response.statusText);
     }
     return response.json().then(result => {
       if (result.errMsg) {
