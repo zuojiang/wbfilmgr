@@ -15,10 +15,9 @@ A web based file manager.
 Usage
 ---
 ```sh
-$ npm install wbfilmgr --global
-$ wbfilmgr /etc
-$ wbfilmgr -p 8080 -u users.json
-$ wbfilmgr --help
+npm install wbfilmgr --global
+wbfilmgr /etc -p 3000 -u users.json
+wbfilmgr --help
 ```
 
 users.json
@@ -27,3 +26,15 @@ users.json
   "username": "password"
 }
 ```
+
+Upload by CLI
+---
+```sh
+npm install file-slicer --global
+file-slicer upload http://user:pass@ip:3000/rest/upload?dirPath=html ./dist
+```
+
+License
+---
+
+MIT

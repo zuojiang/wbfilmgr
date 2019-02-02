@@ -10,6 +10,7 @@ export default function (url, {
   const options = {
     timeout,
     retryMaxCount: 5,
+    retryDelay: 500,
     credentials: 'same-origin',
     ...opts,
   }

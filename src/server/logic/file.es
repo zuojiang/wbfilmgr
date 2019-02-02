@@ -133,10 +133,14 @@ router.put('/rename', async (req, res, next) => {
 })
 
 router.post('/upload', fileSlicer.middleware({
-  returnAbsPath ({req, res, name, id}) {
+  returnAbsPath ({req, res, name, id, dir}) {
     const {absPath} = res.locals
+    if (dir) {
+      return Path.join(absPath, id, dir, name)
+    }
     return Path.join(absPath, name)
-  }
+  },
+  override: true,
 }), (req, res) => {
   res.json({data: req.files.length})
 })
