@@ -9,6 +9,7 @@ export default function (url, {
 } = {}) {
   const options = {
     timeout,
+    skipTest: true,
     retryMaxCount: 5,
     retryDelay: 500,
     credentials: 'same-origin',
