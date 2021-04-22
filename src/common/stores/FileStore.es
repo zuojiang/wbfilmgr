@@ -1,21 +1,15 @@
-import {
-  observable,
-  computed,
-  action,
-  runInAction,
-} from 'mobx'
+import { observable, computed, action, runInAction } from 'mobx'
 import qs from 'qs'
 import fileSaver from 'file-saver'
 
-import {
-  fileService,
-} from '~/common/services'
+import { fileService } from '~/common/services'
 import BaseStore from './BaseStore'
 
 export default class FileStore extends BaseStore {
   constructor(data) {
     super(data)
   }
+
   directoryActionSheetModal = null
 
   fileActionSheetModal = null
@@ -30,7 +24,7 @@ export default class FileStore extends BaseStore {
 
   @observable transition = null
 
-  @computed get parentDir () {
+  @computed get parentDir() {
     if (this.dirPath) {
       const paths = this.dirPath.split('/')
       paths.pop()
@@ -39,7 +33,7 @@ export default class FileStore extends BaseStore {
     return null
   }
 
-  @computed get dirName () {
+  @computed get dirName() {
     if (this.dirPath) {
       const paths = this.dirPath.split('/')
       return paths.pop()
@@ -47,55 +41,70 @@ export default class FileStore extends BaseStore {
     return ''
   }
 
-  @computed get previewUrl () {
+  @computed get previewUrl() {
     if (!this.currentFile) {
       return '#'
     }
-    const {
-      baseUrl,
-    } = this.stores.configStore
-    const {
-      fileName,
-    } = this.currentFile
-    return baseUrl +'/serve?'+ qs.stringify({
-      fileName,
-      dirPath: this.dirPath,
-    })
+    const { baseUrl } = this.stores.configStore
+    const { fileName } = this.currentFile
+    return (
+      baseUrl +
+      '/image/resize?' +
+      qs.stringify({
+        width: global.screen ? global.screen.width : 300,
+        fileName,
+        dirPath: this.dirPath,
+      })
+    )
   }
 
-  @computed get downloadUrl () {
+  @computed get fileUrl() {
     if (!this.currentFile) {
       return '#'
     }
-    const {
-      restUrl,
-    } = this.stores.configStore
-    const {
-      fileName,
-    } = this.currentFile
-    return restUrl +'/download?'+ qs.stringify({
-      fileName,
-      dirPath: this.dirPath,
-    })
+    const { baseUrl } = this.stores.configStore
+    const { fileName } = this.currentFile
+    return (
+      baseUrl +
+      '/serve?' +
+      qs.stringify({
+        fileName,
+        dirPath: this.dirPath,
+      })
+    )
   }
 
-  changeDir = async (dirPath) => {
+  @computed get downloadUrl() {
+    if (!this.currentFile) {
+      return '#'
+    }
+    const { restUrl } = this.stores.configStore
+    const { fileName } = this.currentFile
+    return (
+      restUrl +
+      '/download?' +
+      qs.stringify({
+        fileName,
+        dirPath: this.dirPath,
+      })
+    )
+  }
+
+  changeDir = async dirPath => {
     if (this.dirPath !== dirPath && this.loading === false) {
       const transition = dirPath.length > this.dirPath.length ? 'sfr' : 'rfr'
       await this.readDir(dirPath, transition)
     }
   }
 
-  refreshDir = async (dirPath) => {
+  refreshDir = async dirPath => {
     if (this.loading === false) {
       await this.readDir(dirPath || '')
     }
   }
 
   readDir = async (dirPath, transition = null) => {
-    const {
-      restUrl,
-    } = this.stores.configStore
+    const { restUrl } = this.stores.configStore
 
     this.loading = true
     try {
@@ -116,9 +125,7 @@ export default class FileStore extends BaseStore {
   }
 
   remove = async (dirPath, files, forever) => {
-    const {
-      restUrl,
-    } = this.stores.configStore
+    const { restUrl } = this.stores.configStore
 
     this.loading = true
     try {
@@ -136,9 +143,7 @@ export default class FileStore extends BaseStore {
   }
 
   makeDir = async (dirPath, dirName) => {
-    const {
-      restUrl,
-    } = this.stores.configStore
+    const { restUrl } = this.stores.configStore
 
     this.loading = true
     try {
@@ -155,9 +160,7 @@ export default class FileStore extends BaseStore {
   }
 
   rename = async (dirPath, newName) => {
-    const {
-      restUrl,
-    } = this.stores.configStore
+    const { restUrl } = this.stores.configStore
 
     const oldName = this.currentFile.fileName
     if (oldName == newName) {
@@ -179,9 +182,7 @@ export default class FileStore extends BaseStore {
   }
 
   upload = async (dirPath, files) => {
-    const {
-      restUrl,
-    } = this.stores.configStore
+    const { restUrl } = this.stores.configStore
 
     this.loading = true
     try {

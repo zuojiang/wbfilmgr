@@ -14,4 +14,5 @@ export default class ConfigStore extends BaseStore {
 
   @observable baseUrl = ''
   @observable restUrl = ''
+  @observable gmSupport = false
 }
