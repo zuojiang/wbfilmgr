@@ -28,6 +28,7 @@ const env = process.env.NODE_ENV || 'test'
 
 async function main({
   rootDir = process.cwd(),
+  domain = null,
   httpPort = null,
   title = null,
   users = null,
@@ -226,7 +227,7 @@ async function main({
 
   return new Promise((resolve, reject) => {
     app.listen(httpPort, (...args) => {
-      const url = `http://${ip.address()}:${httpPort}`
+      const url = `http://${domain || ip.address()}:${httpPort}`
       if (env != 'development') {
         console.log('')
         qrcode.generate(url)
@@ -242,6 +243,7 @@ if (env == 'development') {
   main({
     rootDir: process.argv[2],
     gmSupport: true,
+    // domain: 'localhost',
     // users: {admin: 'admin'},
   })
 }

@@ -157,7 +157,7 @@ export default class App extends Component {
                         )
                       } else if (type === 'file') {
                         let media = null
-                        if (gmSupport && isImage(fileName)) {
+                        if (gmSupport && isSupportedImage(fileName)) {
                           const imgUrl =
                             baseUrl +
                             '/image/resize?' +
@@ -226,11 +226,12 @@ export default class App extends Component {
         </ActionSheetModal>
         <ActionSheetModal ref={el => (fileStore.fileActionSheetModal = el)}>
           <List>
-            {gmSupport && isImage(currentFile ? currentFile.fileName : '') && (
-              <List.Item>
-                <img src={previewUrl} />
-              </List.Item>
-            )}
+            {gmSupport &&
+              isSupportedImage(currentFile ? currentFile.fileName : '') && (
+                <List.Item>
+                  <img src={previewUrl} />
+                </List.Item>
+              )}
             <List.Item>
               <Link
                 className={css.actionSheetLink}
@@ -369,7 +370,13 @@ export default class App extends Component {
   }
 }
 
-function isImage(fileName) {
+function isSupportedImage(fileName) {
   const type = mime.getType(fileName)
-  return type ? /^image\//.test(type) : false
+  return [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/bmp',
+  ].some(i => i === type)
 }

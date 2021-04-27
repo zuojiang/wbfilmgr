@@ -14,6 +14,10 @@ const {
   ...options
 } = yargs
   .options({
+    domain: {
+      alias: "d",
+      describe: "Display domain"
+    },
     "http-port": {
       alias: "p",
       describe: "HTTP port",
