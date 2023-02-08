@@ -30,9 +30,12 @@ async function main({
   rootDir = process.cwd(),
   domain = null,
   httpPort = null,
+  url = null,
   title = null,
+  user = null,
   users = null,
   gmSupport = false,
+  quiet = false,
 } = {}) {
   rootDir = Path.normalize(rootDir)
 
@@ -64,6 +67,14 @@ async function main({
     app.use(
       basicAuth({
         users,
+        challenge: true,
+      })
+    )
+  } else if (user) {
+    const [name, pass = ''] = String(user).split(':')
+    app.use(
+      basicAuth({
+        users: { [name]: pass },
         challenge: true,
       })
     )
@@ -227,13 +238,17 @@ async function main({
 
   return new Promise((resolve, reject) => {
     app.listen(httpPort, (...args) => {
-      const url = `http://${domain || ip.address()}:${httpPort}`
-      if (env != 'development') {
+      if (!quiet) {
+        if (!url) {
+          url = `http://${domain || ip.address()}:${httpPort}`
+        }
+        if (env != 'development') {
+          console.log('')
+          qrcode.generate(url)
+        }
         console.log('')
-        qrcode.generate(url)
+        console.log(url)
       }
-      console.log('')
-      console.log(url)
       resolve(app)
     })
   })

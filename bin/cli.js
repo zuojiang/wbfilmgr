@@ -16,20 +16,27 @@ const {
   .options({
     domain: {
       alias: "d",
-      describe: "Display domain"
+      describe: "Set display domain"
     },
     "http-port": {
       alias: "p",
-      describe: "HTTP port",
+      describe: "Set HTTP port",
       type: "number"
+    },
+    "url": {
+      describe: "Set access URL"
     },
     title: {
       alias: "t",
-      describe: "Document's title"
+      describe: "Set document's title"
     },
     "user-list": {
       alias: "u",
       describe: "The JSON file contains a list of user"
+    },
+    "user": {
+      alias: 's',
+      describe: "Set single user (e.g. name:pass)"
     },
     "not-check-update": {
       describe: "Don't check latest version",
@@ -37,6 +44,11 @@ const {
     },
     "gm-support": {
       describe: "GraphicsMagick or ImageMagick support",
+      type: "boolean"
+    },
+    quiet: {
+      alias: "q",
+      describe: "Quiet mode",
       type: "boolean"
     }
   })
